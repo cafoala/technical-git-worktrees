@@ -1,19 +1,22 @@
-# Git Worktrees — Demo Runsheet (v2, ML-dashboard edition)
+# Git Worktrees — Demo Runsheet
 
-A driver's-seat companion to **git-worktrees-v2.pptx**. Everything here is
-copy-paste ready. The demo repo is a small but real ML project: an XGBoost
-model with Bayesian hyperparameter tuning, served behind a Streamlit dashboard.
+A driver's-seat companion to **git-worktrees.pptx** (in this folder). Everything
+here is copy-paste ready. The demo runs on **this repo** — a small but real ML
+project: an XGBoost model with Bayesian hyperparameter tuning behind a Streamlit
+dashboard.
 
-The **core narrative** is a before/after: first feel the **`git stash` pain**
-of juggling a long-running experiment against an urgent fix in one working
+The **core narrative** is a before/after: first feel the **`git stash` pain** of
+juggling a long-running experiment against an urgent fix in one working
 directory, then show how **git worktrees** make the pain vanish — and why that's
 exactly what you want when AI agents are each off doing their own task.
 
 > **Set this first** (in the terminal you'll present from):
 > ```bash
-> export REPO=~/Desktop/rse_role/ml-dashboard-demo   # the working repo unpack-demo.sh creates
+> export REPO=~/Desktop/rse_role/technical-git-worktrees   # this repo
 > cd "$REPO"
 > ```
+> Practising? Work on a throwaway clone so your demo commits/branches don't pile
+> up here: `git clone . ../wt-demo && cd ../wt-demo` (then `export REPO=$PWD`).
 
 ---
 
@@ -25,10 +28,9 @@ exactly what you want when AI agents are each off doing their own task.
 | 2:00–4:00 | 3 | Why RSEs feel it more (a model is training on branch A…) |
 | 4:00–6:00 | 4–6 | Mental model + the four commands |
 | 6:00–9:00 | 7–8 | **Demo 1a:** run the tuning experiment, then the `git stash` juggling (the pain) |
-| 9:00–12:00 | 7–8 | **Demo 1b:** drop the stashes, do it with worktrees while the experiment runs |
-| 12:00–14:00 | 9–10 | (Optional) review a branch / compare two model versions |
-| 14:00–16:30 | 11–13 | Gotchas, tips, when-to-use |
-| 16:30–18:30 | 14 (new) | **Demo 2:** launch parallel AI agents, one worktree each |
+| 9:00–13:00 | 7–8 | **Demo 1b:** drop the stashes, do it with worktrees while the experiment runs |
+| 13:00–16:30 | 11–13 | Gotchas, tips, when-to-use |
+| 16:30–18:30 | 14 | **Demo 2:** launch parallel AI agents, one worktree each |
 | 18:30–20:00 | 15–16 | Cheat sheet + tl;dr + Q&A |
 
 ---
@@ -36,10 +38,7 @@ exactly what you want when AI agents are each off doing their own task.
 ## One-time prep (do before you present)
 
 ```bash
-# from the talk folder (technical-git-worktrees/)
-bash unpack-demo.sh                 # clones a fresh working repo + bare remote
-
-cd ../ml-dashboard-demo
+cd "$REPO"
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt     # includes jupyterlab
 
@@ -176,25 +175,25 @@ files, and none of them disturbs my still-running experiment."
 
 ```bash
 cd "$REPO"
-git worktree add ../ml-dashboard-csv   -b agent/csv-export    main
-git worktree add ../ml-dashboard-tests -b agent/feature-tests main
-git worktree add ../ml-dashboard-docs  -b agent/docstrings    main
+git worktree add ../dashboard-csv   -b agent/csv-export    main
+git worktree add ../dashboard-tests -b agent/feature-tests main
+git worktree add ../dashboard-docs  -b agent/docstrings    main
 git worktree list        # 3 agents, 3 branches, one repo — and the experiment still going
 ```
 
 Launch an agent in each (separate terminals/tabs) and paste the matching prompt:
 
 ```bash
-cd ../ml-dashboard-csv   && claude     # then paste prompt A
-cd ../ml-dashboard-tests && claude     # then paste prompt B
-cd ../ml-dashboard-docs  && claude     # then paste prompt C
+cd ../dashboard-csv   && claude     # then paste prompt A
+cd ../dashboard-tests && claude     # then paste prompt B
+cd ../dashboard-docs  && claude     # then paste prompt C
 ```
 
 | Worktree / branch | Prompt to paste |
 |---|---|
 | `agent/csv-export` | *In `frontend/app.py`, add a "Download predictions as CSV" button under the predicted-vs-actual chart using `st.download_button` and the predictions DataFrame the app already builds. Reuse the colours from `frontend/theme.py`. Don't touch `backend/`.* |
 | `agent/feature-tests` | *Write pytest unit tests in `tests/test_data.py` for the feature-engineering functions in `backend/data.py` (`add_engineered_features`, `_safe_ratio`), including edge cases (zero denominator, missing values). Only modify files under `tests/`. Run `python -m pytest -q`.* |
-| `agent/docstrings` | *Add NumPy-style docstrings and PEP 484 type hints to the public functions in `backend/model.py` and `backend/data.py`, and add an "## Architecture" section to `README.md` describing the backend/frontend split. Don't change runtime behaviour.* |
+| `agent/docstrings` | *Add NumPy-style docstrings and PEP 484 type hints to the public functions in `backend/model.py` and `backend/data.py`, and a short "## Architecture" note to `README.md`. Don't change runtime behaviour.* |
 
 **You don't need to wait for them.** The picture is the point: three agents on
 three branches at once, no collisions, no stashing — while the experiment is
@@ -203,54 +202,24 @@ slides. (Merging the good ones later is conflict-free — different files.)
 
 ---
 
-## (Optional) DEMO 3 — Review a colleague's branch side-by-side  *(slide 9)*
+## Cleanup / reset (between practice runs)
 
 ```bash
 cd "$REPO"
-git fetch origin
-git worktree add ../ml-dashboard-review origin/feature/whatif-predictor
-cd ../ml-dashboard-review
-WT_VENV="$REPO/.venv" ./run_dashboard.sh --server.port 8503   # their what-if panel, live
-cd "$REPO" && git worktree remove ../ml-dashboard-review
-```
-
-## (Optional) DEMO 4 — Compare two model versions  *(slide 10)*
-
-```bash
-cd "$REPO"
-git worktree add ../ml-dashboard-baseline v1.0      # the pre-tuning version
-
-# Terminal A — baseline (v1.0 has no tuning code, so it trains a plain model)
-(cd ../ml-dashboard-baseline && WT_VENV="$REPO/.venv" ./run_train.sh)
-
-# Terminal B — current main (Bayesian-tuned)
-./run_train.sh --mode tuned --trials 120
-# compare the RMSE each prints — tuned should win
-```
-
----
-
-## Cleanup / reset (re-run the whole demo from scratch)
-
-```bash
-# from the talk folder (technical-git-worktrees/)
-bash unpack-demo.sh            # nukes worktrees + working repo and reclones fresh
-```
-
-Or, by hand, from inside `$REPO`:
-
-```bash
-for w in dashboard-colorfix ml-dashboard-csv ml-dashboard-tests ml-dashboard-docs \
-         ml-dashboard-review ml-dashboard-baseline; do
+for w in dashboard-colorfix dashboard-csv dashboard-tests dashboard-docs; do
   git worktree remove "../$w" --force 2>/dev/null
 done
 git worktree prune
+git switch main 2>/dev/null
 git branch -D colorblind-fix fix/colorblind-palette \
   agent/csv-export agent/feature-tests agent/docstrings 2>/dev/null
 git stash clear
-git switch main 2>/dev/null
+git checkout -- .              # restore the red/green palette etc.
 git worktree list              # back to just the main worktree
 ```
+
+*(Cleanest of all: practise on a throwaway clone — `git clone . ../wt-demo` — and
+just `rm -rf ../wt-demo` afterwards.)*
 
 ---
 
@@ -266,7 +235,6 @@ git worktree list              # back to just the main worktree
   metadata.
 - **`remove` refuses (worktree dirty)** — add `--force`, or commit/clean first.
 - **Dashboard didn't recolour** — hard-refresh the browser.
-- **Total reset** — `bash unpack-demo.sh`.
 
 ---
 

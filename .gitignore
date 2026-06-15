@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- ML dashboard artifacts ---
+models/
+.pytest_cache/
+scikit_learn_data/
