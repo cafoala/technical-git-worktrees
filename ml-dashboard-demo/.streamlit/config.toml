@@ -1,0 +1,8 @@
+# Dashboard theme. The primaryColor below is the non-colourblind-safe red that
+# the `colorblind-fix` worktree changes (alongside frontend/theme.py).
+[theme]
+primaryColor = "#d62728"
+base = "light"
+
+[server]
+headless = true
