@@ -61,8 +61,8 @@ X,_,y,_ = load_dataset(); bayesian_search(X,y,n_trials=10)"
 ```
 
 Have visible: **two terminals**, the **dashboard** in a browser tab
-(`./run_dashboard.sh` → http://localhost:8501), and the **experiment notebook**
-open (Jupyter or VS Code).
+(`.venv/bin/streamlit run frontend/app.py` → http://localhost:8501), and the
+**experiment notebook** open (Jupyter or VS Code).
 
 > **Why a worktree beats stashing here** (say this — it pre-empts the heckle): a
 > branch is just a pointer; *processes run in a working directory*, and a
@@ -151,8 +151,8 @@ PRIMARY = "#0072B2"
 ```
 
 …and `primaryColor = "#0072B2"` in **.streamlit/config.toml**. *(Optional: preview
-it in isolation without touching :8501 — `WT_VENV="$REPO/.venv" ./run_dashboard.sh
---server.port 8502`.)* Then:
+it in isolation without touching :8501 — from the worktree, `"$REPO/.venv/bin/streamlit"
+run frontend/app.py --server.port 8502`.)* Then:
 
 ```bash
 git add -A && git commit -m "fix: Okabe-Ito colourblind-safe palette"

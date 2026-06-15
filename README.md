@@ -25,8 +25,8 @@ python -m backend.train --mode baseline
 streamlit run frontend/app.py
 ```
 
-Convenience wrappers: `./run_train.sh` and `./run_dashboard.sh` (both manage the
-venv for you; the dashboard script forwards args, e.g. `--server.port 8502`).
+Tip: a second instance on another port — `streamlit run frontend/app.py
+--server.port 8502` — is handy for previewing a change made in a worktree.
 
 ## Layout
 

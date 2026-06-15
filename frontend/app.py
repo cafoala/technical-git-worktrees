@@ -30,7 +30,7 @@ st.title("🏠 California Housing — Price Model Dashboard")
 
 if not M.model_exists():
     st.info(
-        "⏳ No trained model yet. Run `./run_train.sh` (or `python -m backend.train`) "
+        "⏳ No trained model yet. Run `python -m backend.train` "
         "to train one — this dashboard updates automatically when it finishes."
     )
     st.stop()
