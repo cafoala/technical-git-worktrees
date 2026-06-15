@@ -2,10 +2,10 @@
 
 Two modes:
 
-  baseline   default XGBoost hyperparameters -- fast, the v1.0 behaviour.
-  tuned      Optuna Bayesian hyperparameter search -- slow, the demo's long
-             job. Requires ``backend/tuning.py`` (added on ``main``; absent at
-             the ``v1.0`` tag, where this transparently falls back to baseline).
+  baseline   default XGBoost hyperparameters (fast).
+  tuned      Optuna Bayesian hyperparameter search. Needs ``backend/tuning.py``
+             (lives on the ``experiment/bayesian-tuning`` branch); without it,
+             tuned mode falls back to baseline.
 
 Usage:
     python -m backend.train                 # tuned (default), N_TRIALS trials
@@ -32,7 +32,7 @@ from .model import METRICS_PATH, MODEL_PATH, MODELS_DIR
 
 DEFAULT_TRIALS = int(os.environ.get("N_TRIALS", "50"))
 
-# Sensible defaults used for --mode baseline and as the fallback at v1.0.
+# Sensible defaults for --mode baseline (and the fallback when tuning is absent).
 BASELINE_PARAMS = dict(
     n_estimators=300,
     max_depth=6,
@@ -85,7 +85,7 @@ def main(argv=None) -> int:
             from .tuning import bayesian_search
         except ModuleNotFoundError:
             print(
-                "[train] no tuning module on this checkout (the v1.0 baseline) "
+                "[train] tuning module not found "
                 "-> running --mode baseline instead.",
                 flush=True,
             )
